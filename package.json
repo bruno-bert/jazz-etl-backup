@@ -1,0 +1,23 @@
+{
+  "name": "jazz-etl",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpileOnly --no-notify src/index.ts",
+    "build": "tsc"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/require-from-string": "^1.2.0",
+    "@types/xml2js": "^0.4.5",
+    "ts-node-dev": "^1.0.0-pre.45",
+    "typescript": "^3.9.5"
+  },
+  "dependencies": {
+    "mongoose": "^5.9.18",
+    "require-from-string": "^2.0.2",
+    "xml2js": "^0.4.23"
+  }
+}
