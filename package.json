@@ -10,8 +10,10 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^26.0.0",
     "@types/require-from-string": "^1.2.0",
     "@types/xml2js": "^0.4.5",
+    "jest": "^26.0.1",
     "ts-node-dev": "^1.0.0-pre.45",
     "typescript": "^3.9.5"
   },

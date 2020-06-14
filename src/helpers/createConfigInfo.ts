@@ -1,6 +1,7 @@
 import ConfigInfo from "../core/ConfigInfo";
 
-const createConfigInfo = (
+/** TODO - define config info type/interface */
+export const createConfigInfo = (
   configFile: string,
   log: string = "toConsole",
   debug: boolean = false,

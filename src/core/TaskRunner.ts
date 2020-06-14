@@ -11,21 +11,24 @@ import Pipeline from "./Pipeline";
 import coreConfig from "../config";
 
 import { loadPipelineTasks, isFunction, isNative, isThis } from "../helpers";
-import { IsLogger } from "./interfaces";
+import { IsLogger, IsPipeline } from "./interfaces";
 
 class TaskRunner {
   private logger: IsLogger;
+  private pipeline: any;
 
-  constructor(taskParameters, config) {
+  /** TODO - anys */
+  constructor(taskParameters: any, config: any) {
     this.logger = config.logger;
     this.pipeline = this.createPipeline(taskParameters, config);
   }
 
-  createPipeline(taskParameters, config) {
-    let TaskClass = null;
+  /** TODO - anys */
+  createPipeline(taskParameters: any, config: any) {
+    let TaskClass: any = null;
     let taskInstance = null;
 
-    Pipeline.clear();
+    Pipeline.getInstance().clear();
 
     const pipeline = loadPipelineTasks(
       config.data.pipeline,
@@ -34,15 +37,18 @@ class TaskRunner {
     );
 
     if (pipeline) {
-      pipeline.map(item => {
+      /* TODO - anys */
+      pipeline.map((item: any) => {
         if (!item.skip || item.skip === false) {
           const source = `${item.pluginSourcePath}/${item.class}`;
           try {
             TaskClass = isNative(source)
-              ? ModuleLoader.loadFromInternalDependency(item.class)
+              ? ModuleLoader.getInstance().loadFromInternalDependency(
+                  item.class
+                )
               : isThis(source)
-              ? ModuleLoader.loadPlugin(source)
-              : ModuleLoader.loadPluginFromPath(source);
+              ? ModuleLoader.getInstance().loadPlugin(source)
+              : ModuleLoader.getInstance().loadPluginFromPath(source);
           } catch (err) {
             this.logger.log(
               `Task informed in pipeline but not implemented: ${source}`,
@@ -75,20 +81,25 @@ class TaskRunner {
                 if (isFunction(item.preExecute)) {
                   taskInstance.preExecute = item.preExecute;
                 } else
-                  taskInstance.preExecute = ModuleLoader.load(item.preExecute);
+                  taskInstance.preExecute = ModuleLoader.getInstance().load(
+                    item.preExecute
+                  );
               }
 
               if (item.execute) {
                 if (isFunction(item.execute)) {
                   taskInstance.execute = item.execute;
-                } else taskInstance.execute = ModuleLoader.load(item.execute);
+                } else
+                  taskInstance.execute = ModuleLoader.getInstance().load(
+                    item.execute
+                  );
               }
 
               if (item.postExecute) {
                 if (isFunction(item.postExecute)) {
                   taskInstance.postExecute = item.postExecute;
                 } else
-                  taskInstance.postExecute = ModuleLoader.load(
+                  taskInstance.postExecute = ModuleLoader.getInstance().load(
                     item.postExecute
                   );
               }
@@ -98,22 +109,29 @@ class TaskRunner {
               if (isFunction(item.getRawData)) {
                 taskInstance.getRawData = item.getRawData;
               } else
-                taskInstance.getRawData = ModuleLoader.load(item.getRawData);
+                taskInstance.getRawData = ModuleLoader.getInstance().load(
+                  item.getRawData
+                );
             }
 
             if (item.ovewritables) {
-              item.ovewritables.map(method => {
+              /** TODO - anys */
+
+              item.ovewritables.map((method: any) => {
                 if (item[method]) {
                   if (isFunction(item[method]))
                     taskInstance[method] = item[method];
-                  else taskInstance[method] = ModuleLoader.load(item[method]);
+                  else
+                    taskInstance[method] = ModuleLoader.getInstance().load(
+                      item[method]
+                    );
                 }
               });
             }
 
             taskInstance.subscribe(this);
 
-            Pipeline.addTask(taskInstance);
+            Pipeline.getInstance().addTask(taskInstance);
           } else {
             this.logger.warn(
               `Task named ${item.class} cannot be instantianted`
@@ -127,7 +145,7 @@ class TaskRunner {
       });
     }
 
-    this.logger.info("Pipeline", Pipeline);
+    this.logger.info("Pipeline" + Pipeline.getInstance());
     return Pipeline;
   }
 
@@ -139,14 +157,14 @@ class TaskRunner {
     }
   }
 
-  onError(err) {
+  onError(err: string) {
     this.logger.error(err);
     throw new Error(err);
   }
 
-  onSuccess(data) {
+  onSuccess(data: any) {
     this.logger.info("Task completed sucessfully");
   }
 }
 
-module.exports = TaskRunner;
+export default TaskRunner;
