@@ -8,31 +8,39 @@
 /* eslint-disable no-plusplus */
 import ModuleLoader from "./ModuleLoader";
 import Pipeline from "./Pipeline";
-import coreConfig from "../config";
+import CoreConfiguration from "./CoreConfiguration";
 
 import { loadPipelineTasks, isFunction, isNative, isThis } from "../helpers";
-import { IsLogger, IsPipeline } from "./interfaces";
+import {
+  IsLogger,
+  IsTaskRunner,
+  IsPipeline,
+  CoreConfigurationType,
+  Configuration
+} from "../types";
 
-class TaskRunner {
+class TaskRunner implements IsTaskRunner {
   private logger: IsLogger;
-  private pipeline: any;
+  private pipeline: IsPipeline;
 
   /** TODO - anys */
-  constructor(taskParameters: any, config: any) {
-    this.logger = config.logger;
-    this.pipeline = this.createPipeline(taskParameters, config);
+  constructor(taskParameters: {}, taskConfig: Configuration) {
+    this.logger = taskConfig.logger;
+    this.pipeline = this.createPipeline(taskParameters, taskConfig);
   }
 
   /** TODO - anys */
-  createPipeline(taskParameters: any, config: any) {
+  createPipeline(taskParameters: {}, taskConfig: Configuration): IsPipeline {
+    /** TODO - anys */
     let TaskClass: any = null;
     let taskInstance = null;
 
     Pipeline.getInstance().clear();
 
+    /* TODO - anys */
     const pipeline = loadPipelineTasks(
-      config.data.pipeline,
-      config.data.plugins,
+      taskConfig.pipelineConfiguration.pipeline,
+      taskConfig.pipelineConfiguration.plugins,
       this.logger
     );
 
@@ -60,13 +68,13 @@ class TaskRunner {
             taskInstance = new TaskClass(
               item.id,
               taskParameters,
-              config,
+              taskConfig,
               item.description,
               item.rawDataFrom
             );
 
             /**  handles methods ovewrites  */
-            if (coreConfig.featureFlags.allowOvewriteExecute) {
+            if (CoreConfiguration.featureFlags.allowOvewriteExecute) {
               taskInstance.preExecute = item.preExecute
                 ? item.preExecute
                 : taskInstance.preExecute;
@@ -141,12 +149,12 @@ class TaskRunner {
           this.logger.info(`Task named ${item.id} skipped`);
         }
 
-        return Pipeline;
+        return Pipeline.getInstance();
       });
     }
 
     this.logger.info("Pipeline" + Pipeline.getInstance());
-    return Pipeline;
+    return Pipeline.getInstance();
   }
 
   async run() {

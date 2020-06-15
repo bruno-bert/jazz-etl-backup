@@ -5,12 +5,12 @@ export default {
     describe: "Jazzpack Configuration File",
     demandOption: true
   },
-  debug: {
+  debugMode: {
     alias: "d",
     describe: "Debug mode",
     default: "false"
   },
-  log: {
+  logStrategy: {
     alias: "l",
     describe: "Log Strategy",
     demandOption: false,

@@ -4,10 +4,10 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-nested-ternary */
 /* eslint-disable array-callback-return */
-import { ModuleLoader } from "../core/ModuleLoader";
+import ModuleLoader from "../core/ModuleLoader";
 import setPluginConfigPath from "./setPluginConfigPath";
 import setPluginSourcePath from "./setPluginSourcePath";
-import { IsTask, IsLogger, IsPlugin } from "../core/interfaces";
+import { IsTask, IsLogger, IsPlugin } from "../types";
 
 const loadPipelineTasks = (
   pipelineInfo: [],

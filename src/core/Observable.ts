@@ -1,4 +1,4 @@
-import { IObservable } from "./interfaces";
+import { IObservable } from "../types";
 
 class Observable implements IObservable {
   private subscribers: any[];

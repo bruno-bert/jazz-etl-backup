@@ -2,115 +2,62 @@
 /* eslint-disable prefer-rest-params */
 /* eslint-disable no-restricted-syntax */
 /* eslint-disable no-console */
-import path from "path";
-import { appendFile } from "fs";
-import { IsLogger } from "./interfaces";
-import config from "../config";
+import { IsLogger } from "../types";
+import Observable from "./Observable";
 
-export class DefaultLogger implements IsLogger {
-  log(message: string, file?: string) {
-    console.log(message);
-  }
-  info(message: string) {
-    console.info(message);
-  }
-  warn(message: string) {
-    console.warn(message);
-  }
-  error(message: string) {
-    console.error(message);
-  }
+export enum LogType {
+  WARNING,
+  INFO,
+  ERROR,
+  LOG
 }
 
-export class ConsoleLogger extends DefaultLogger implements IsLogger {
-  log(message: string) {
-    console.log(message);
-  }
-}
-
-export class ConsoleWithDateLogger extends DefaultLogger implements IsLogger {
-  log(message: string) {
-    const timestamp = new Date().toISOString();
-    console.log(`${timestamp} - ${message}`);
-  }
-}
-
-export class FileLogger extends DefaultLogger implements IsLogger {
-  log(message: string, file: string) {
-    const timestamp = new Date().toISOString();
-    const f = file || "logs.txt";
-    const fileName = path.join(__dirname, f);
-    appendFile(fileName, `${timestamp} - ${message} \n`, error => {
-      if (error) {
-        console.log("Error writing to file");
-        console.error(error);
-      }
-    });
-  }
-}
-
-export class NoLogger extends DefaultLogger implements IsLogger {
-  log(message: string) {
-    return message;
-  }
-}
-
-export class Logger {
-  private static instance: Logger;
-  private strategy: IsLogger;
+export class DefaultLogger extends Observable implements IsLogger {
+  private static instance: DefaultLogger;
   private showWarn: boolean;
   private showInfo: boolean;
   private showError: boolean;
-  private debug: boolean;
+  private debugMode: boolean;
 
-  private constructor(strategy: IsLogger) {
-    this.strategy = strategy;
+  private constructor() {
+    super();
     this.showWarn = false;
     this.showInfo = false;
     this.showError = true;
-    this.debug = false;
+    this.debugMode = false;
   }
 
-  static getInstance(): Logger {
-    if (!Logger.instance) {
-      Logger.instance = new Logger(config.logStrategy);
+  setDebugMode(debugMode: boolean) {
+    this.debugMode = debugMode;
+  }
+
+  static getInstance(): IsLogger {
+    if (!DefaultLogger.instance) {
+      DefaultLogger.instance = new DefaultLogger();
     }
-    return Logger.instance;
+    return DefaultLogger.instance;
   }
 
-  log() {
-    for (const i in arguments) {
-      this.strategy.log(arguments[i]);
-    }
+  log(message: string, file?: string) {
+    console.log(message);
+    this.notify({ type: LogType.LOG, message });
   }
-
-  warn() {
-    if (this.showWarn || this.debug) {
-      for (const i in arguments) {
-        this.strategy.log(arguments[i]);
-      }
-    }
-  }
-
-  success() {
-    for (const i in arguments) {
-      this.strategy.log(arguments[i]);
+  info(message: string) {
+    if (this.showInfo || this.debugMode) {
+      console.info(message);
+      this.notify({ type: LogType.INFO, message });
     }
   }
-
-  error() {
-    if (this.showError || this.debug) {
-      for (const i in arguments) {
-        this.strategy.log(arguments[i]);
-      }
+  warn(message: string) {
+    if (this.showWarn || this.debugMode) {
+      console.warn(message);
+      this.notify({ type: LogType.WARNING, message });
     }
   }
-
-  info() {
-    if (this.showInfo || this.debug) {
-      for (const i in arguments) {
-        this.strategy.log(arguments[i]);
-      }
+  error(message: string) {
+    if (this.showError || this.debugMode) {
+      console.error(message);
+      this.notify({ type: LogType.ERROR, message });
     }
   }
 }

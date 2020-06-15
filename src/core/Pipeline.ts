@@ -1,9 +1,11 @@
 import { isPreTask, isPostTask } from "../helpers";
-import { IsTask, IsPipeline } from "./interfaces";
+import { IsTask, IsPipeline } from "../types";
 
 class Pipeline implements IsPipeline {
   private static instance: Pipeline;
-  private items: IsTask[];
+
+  public items: IsTask[];
+
   private results: IsTask[];
 
   private constructor() {

@@ -3,7 +3,7 @@
 
 import Observable from "./Observable";
 import ModuleLoader from "./ModuleLoader";
-import { IsTask, TaskConfig, IsPipeline, IsLogger } from "./interfaces";
+import { IsTask, TaskConfig, IsPipeline, IsLogger } from "../types";
 
 export class Task extends Observable implements IsTask {
   public moduleLoader: ModuleLoader;
@@ -12,14 +12,14 @@ export class Task extends Observable implements IsTask {
   public description: string;
   public taskConfig: TaskConfig;
   public rawDataFrom: any;
-  public params: [] | {};
+  public taskParams: {};
   public logger: IsLogger;
   public pipeline: IsPipeline;
   public result: [];
 
   constructor(
     id: string,
-    params: [] | {},
+    taskParams: {},
     config: TaskConfig,
     description: string = "",
     rawDataFrom: any = null
@@ -32,7 +32,7 @@ export class Task extends Observable implements IsTask {
     this.taskConfig = config.data;
     this.logger = config.logger;
     this.rawDataFrom = rawDataFrom;
-    this.params = params;
+    this.taskParams = taskParams; /** TODO - apparently, it is not being used - confirm later and then remove  */
     this.result = [];
 
     Task.validateConfiguration(config);

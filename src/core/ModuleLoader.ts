@@ -1,9 +1,9 @@
 /* eslint-disable class-methods-use-this */
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/no-dynamic-require */
-import config from "../config";
+import CoreConfiguration from "./CoreConfiguration";
 import requireFromString from "require-from-string";
-import { ILoadModuleStrategy } from "./interfaces";
+import { ILoadModuleStrategy } from "../types";
 
 export class ModuleLoadedFromInternal implements ILoadModuleStrategy {
   load(name: string) {
@@ -50,7 +50,9 @@ class ModuleLoader {
 
   static getInstance(): ModuleLoader {
     if (!ModuleLoader.instance) {
-      ModuleLoader.instance = new ModuleLoader(config.moduleLoadStrategy);
+      ModuleLoader.instance = new ModuleLoader(
+        CoreConfiguration.moduleLoadStrategy
+      );
     }
     return ModuleLoader.instance;
   }
@@ -60,7 +62,7 @@ class ModuleLoader {
   }
 
   loadPackage(name: string | Function) {
-    return config.featureFlags.detachJazzPack
+    return CoreConfiguration.featureFlags.detachJazzPack
       ? this.strategy.load(name)
       : this.loadFromInternalDependency(name);
   }
@@ -71,7 +73,7 @@ class ModuleLoader {
 
   /** TODO */
   loadPlugin(name: string | Function): any {
-    return config.featureFlags.detachPluginOnPackage
+    return CoreConfiguration.featureFlags.detachPluginOnPackage
       ? this.strategy.load(name)
       : this.loadFromInternalDependency(name);
   }
@@ -82,7 +84,7 @@ class ModuleLoader {
   }
 
   loadFunction(name: string | Function | {}) {
-    return config.featureFlags.detachFunctionOnPackage
+    return CoreConfiguration.featureFlags.detachFunctionOnPackage
       ? this.strategy.load(name)
       : this.loadFromInternalDependency(name);
   }
