@@ -95,9 +95,9 @@ Logger implementation (that needs to implement the interface IsLogger) (common u
 */
 export interface IsUserConfig {
   configFile: string;
-  logStrategy: logStrategy;
-  debugMode: boolean;
-  decryptKey: string | null;
+  logStrategy?: logStrategy;
+  debugMode?: boolean;
+  decryptKey?: string | null;
 }
 
 export interface ILoadModuleStrategy {

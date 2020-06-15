@@ -1,3 +1,2 @@
-import ExtractorXmlToJson from "../processors/Extractors/ExtractorXmlToJson";
-
+import ExtractorXmlToJson from ".";
 ExtractorXmlToJson("./src/test.xml", "./src/test.json");
