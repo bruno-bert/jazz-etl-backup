@@ -85,8 +85,8 @@ export class PipelineRunner implements IsRunner {
   private userConfig: IsUserConfig;
 
   constructor(userConfig: IsUserConfig) {
-    this.runner = this.buildRunner();
     this.userConfig = userConfig;
+    this.runner = this.buildRunner();
   }
 
   buildRunner(): IsTaskRunner {

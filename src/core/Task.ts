@@ -3,24 +3,30 @@
 
 import Observable from "./Observable";
 import ModuleLoader from "./ModuleLoader";
-import { IsTask, TaskConfig, IsPipeline, IsLogger } from "../types";
+import {
+  IsTask,
+  IsPipeline,
+  IsLogger,
+  Configuration,
+  PipelineConfiguration
+} from "../types";
 
 export class Task extends Observable implements IsTask {
   public moduleLoader: ModuleLoader;
   public rawData: any;
   public id: string;
   public description: string;
-  public taskConfig: TaskConfig;
+  public config: PipelineConfiguration;
   public rawDataFrom: any;
-  public taskParams: {};
+  public params: {};
   public logger: IsLogger;
   public pipeline: IsPipeline;
   public result: [];
 
   constructor(
     id: string,
-    taskParams: {},
-    config: TaskConfig,
+    params: {},
+    config: Configuration,
     description: string = "",
     rawDataFrom: any = null
   ) {
@@ -29,13 +35,13 @@ export class Task extends Observable implements IsTask {
     this.pipeline = require("./Pipeline");
     this.id = id;
     this.description = description;
-    this.taskConfig = config.data;
+    this.config = config.pipelineConfiguration;
     this.logger = config.logger;
     this.rawDataFrom = rawDataFrom;
-    this.taskParams = taskParams; /** TODO - apparently, it is not being used - confirm later and then remove  */
+    this.params = params; /** TODO - apparently, it is not being used - confirm later and then remove  */
     this.result = [];
 
-    Task.validateConfiguration(config);
+    Task.validateConfiguration(this.config);
 
     this.rawData = null;
   }
@@ -89,7 +95,7 @@ export class Task extends Observable implements IsTask {
     return this.moduleLoader.loadFunction(object);
   }
 
-  static validateConfiguration(config: TaskConfig) {
+  static validateConfiguration(config: PipelineConfiguration) {
     if (!config) {
       throw new TypeError("Configuration object is required");
     }
@@ -103,7 +109,7 @@ export class Task extends Observable implements IsTask {
     this.logger.log(`Ending task ${this.id}`);
   }
 
-  save(data: any, prefix?: string) {
+  async save(data: any, prefix?: string) {
     if (data) {
       this.getPipeline().addResult({
         ...this,
@@ -113,15 +119,15 @@ export class Task extends Observable implements IsTask {
     }
   }
 
-  preExecute() {
+  async preExecute() {
     return null;
   }
 
-  execute() {
+  async execute() {
     return null;
   }
 
-  postExecute() {
+  async postExecute() {
     return null;
   }
 }

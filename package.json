@@ -5,7 +5,9 @@
   "main": "dist/index.js",
   "scripts": {
     "dev": "ts-node-dev --respawn --transpileOnly --no-notify src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest --watch",
+    "test:once": "jest"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +17,7 @@
     "@types/require-from-string": "^1.2.0",
     "@types/xml2js": "^0.4.5",
     "jest": "^26.0.1",
+    "ts-jest": "^26.1.0",
     "ts-node-dev": "^1.0.0-pre.45",
     "typescript": "^3.9.5"
   },

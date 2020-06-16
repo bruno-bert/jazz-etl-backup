@@ -9,7 +9,7 @@ export type CoreConfigurationType = {
   env: string;
   defaultKey: string;
   logStrategy: IsLogger;
-  moduleLoadStrategy: ILoadModuleStrategy;
+  moduleLoadStrategy: LoadModuleStrategy | null;
   featureFlags: FeatureFlagsType;
 };
 
@@ -88,6 +88,7 @@ export interface Configuration {
 /**
 * This interface contains the configuration that can be informed in the moment the pipeline runner is instantiated
 * @param configFile: It contains the file path of the jazz configuration file (.js file)
+* The path must be informed by considering the project root path 
 * @param InputProcessParameters: It contains an object with parameters that will override the default configuration in the file
 * @param logStrategy: [NOT IMPLEMENTED - DO NOT USE] Log Strategy: this option allows the user to set a customized 
 Logger implementation (that needs to implement the interface IsLogger) (common use, for example to log the process results into a text file in File System)   
@@ -102,19 +103,26 @@ export interface IsUserConfig {
   decryptKey?: string | null;
 }
 
-export interface ILoadModuleStrategy {
+export interface LoadModuleStrategy {
   load(name: string | Function | {}, appendPaths?: string[]): {};
 }
 
 export interface IsTask {
   id: string;
+  description?: string;
+  rawDataFrom?: any;
   prefix?: string;
   result: [] | {} | null;
+  pluginSourcePath?: string;
+  skip?: boolean;
+  class?: string | {} | Function;
+  ovewritables?: any;
   run(): Promise<void>;
-  execute?(): void;
-  preExecute?(): void;
-  postExecute?(): void;
-  getRawData?(): void;
+  execute?(): Promise<any>;
+  preExecute?(): Promise<any>;
+  postExecute?(): Promise<any>;
+  save?(data: any, prefix?: string): Promise<any>;
+  getRawData?(): any;
   onError(err: string): void;
   getPipeline(): IsPipeline;
 
@@ -123,10 +131,7 @@ export interface IsTask {
   setRawData(data: any): void;
   validateConditionsForExecution(data: any): void;
 }
-export interface TaskConfig {
-  data: any;
-  logger: any;
-}
+
 export interface Buffer {
   /** TODO */
 }

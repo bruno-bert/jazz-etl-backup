@@ -3,29 +3,33 @@
 /* eslint-disable import/no-dynamic-require */
 import CoreConfiguration from "./CoreConfiguration";
 import requireFromString from "require-from-string";
-import { ILoadModuleStrategy } from "../types";
+import { LoadModuleStrategy } from "../types";
 
-export class ModuleLoadedFromInternal implements ILoadModuleStrategy {
+export class ModuleLoadedFromInternal implements LoadModuleStrategy {
+  constructor() {}
   load(name: string) {
-    return require(`./${name}`);
+    return require(`../${name}`);
   }
 }
 
-export class ModuleLoadedFromExternal implements ILoadModuleStrategy {
+export class ModuleLoadedFromExternal implements LoadModuleStrategy {
+  constructor() {}
   load(name: string) {
     const module = require(`${process.cwd()}/${name}`);
     return module;
   }
 }
 
-export class ModuleLoadedFromPath implements ILoadModuleStrategy {
+export class ModuleLoadedFromPath implements LoadModuleStrategy {
+  constructor() {}
   load(name: string) {
     const module = require(name);
     return module;
   }
 }
 
-export class ModuleLoadedFromMemory implements ILoadModuleStrategy {
+export class ModuleLoadedFromMemory implements LoadModuleStrategy {
+  constructor() {}
   load(code: string, appendPaths: string[]) {
     return requireFromString(code, { appendPaths });
   }
@@ -33,13 +37,15 @@ export class ModuleLoadedFromMemory implements ILoadModuleStrategy {
 
 class ModuleLoader {
   private static instance: ModuleLoader;
-  private strategy: ILoadModuleStrategy;
-  private fromMemoryLoader: ILoadModuleStrategy;
-  private fromInternalLoader: ILoadModuleStrategy;
-  private fromExternalLoader: ILoadModuleStrategy;
-  private fromPathLoader: ILoadModuleStrategy;
+  private strategy: LoadModuleStrategy;
+  private fromMemoryLoader: LoadModuleStrategy;
+  private fromInternalLoader: LoadModuleStrategy;
+  private fromExternalLoader: LoadModuleStrategy;
+  private fromPathLoader: LoadModuleStrategy;
 
-  private constructor(strategy: ILoadModuleStrategy) {
+  private constructor(
+    strategy: LoadModuleStrategy = new ModuleLoadedFromExternal()
+  ) {
     this.strategy = strategy;
 
     this.fromMemoryLoader = new ModuleLoadedFromMemory();
@@ -51,7 +57,7 @@ class ModuleLoader {
   static getInstance(): ModuleLoader {
     if (!ModuleLoader.instance) {
       ModuleLoader.instance = new ModuleLoader(
-        CoreConfiguration.moduleLoadStrategy
+        CoreConfiguration.moduleLoadStrategy || new ModuleLoadedFromExternal()
       );
     }
     return ModuleLoader.instance;

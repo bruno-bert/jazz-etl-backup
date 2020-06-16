@@ -2,7 +2,6 @@
 export { default as setPluginConfigPath } from "./setPluginConfigPath";
 export { default as loadPipelineTasks } from "./loadPipelineTasks";
 export { default as loadPluginsConfig } from "./loadPluginsConfig";
-export { default as createConfigInfo } from "./createConfigInfo";
 
 //export { default as encrypter, decrypter, decryptToString } from "./encryption";
 //export { default as requireFromString } from "./requireFromString";

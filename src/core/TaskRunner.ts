@@ -15,8 +15,8 @@ import {
   IsLogger,
   IsTaskRunner,
   IsPipeline,
-  CoreConfigurationType,
-  Configuration
+  Configuration,
+  IsTask
 } from "../types";
 
 class TaskRunner implements IsTaskRunner {
@@ -33,7 +33,7 @@ class TaskRunner implements IsTaskRunner {
   createPipeline(taskParameters: {}, taskConfig: Configuration): IsPipeline {
     /** TODO - anys */
     let TaskClass: any = null;
-    let taskInstance = null;
+    let taskInstance: any = null;
 
     Pipeline.getInstance().clear();
 
@@ -46,92 +46,93 @@ class TaskRunner implements IsTaskRunner {
 
     if (pipeline) {
       /* TODO - anys */
-      pipeline.map((item: any) => {
-        if (!item.skip || item.skip === false) {
-          const source = `${item.pluginSourcePath}/${item.class}`;
+      pipeline.map((task: any) => {
+        if (!task.skip) {
+          let source = `${task.pluginSourcePath}/${task.class}`;
+          source = isNative(source) ? task.class : source;
+
           try {
             TaskClass = isNative(source)
               ? ModuleLoader.getInstance().loadFromInternalDependency(
-                  item.class
+                  task.class
                 )
               : isThis(source)
               ? ModuleLoader.getInstance().loadPlugin(source)
               : ModuleLoader.getInstance().loadPluginFromPath(source);
           } catch (err) {
-            this.logger.log(
-              `Task informed in pipeline but not implemented: ${source}`,
-              err
+            this.logger.error(
+              `Error on trying to instantiate the task ${source}: ${err}`
             );
           }
 
+          console.warn(TaskClass);
+
           if (TaskClass) {
             taskInstance = new TaskClass(
-              item.id,
+              task.id,
               taskParameters,
               taskConfig,
-              item.description,
-              item.rawDataFrom
+              task.description,
+              task.rawDataFrom
             );
 
             /**  handles methods ovewrites  */
             if (CoreConfiguration.featureFlags.allowOvewriteExecute) {
-              taskInstance.preExecute = item.preExecute
-                ? item.preExecute
+              taskInstance.preExecute = task.preExecute
+                ? task.preExecute
                 : taskInstance.preExecute;
-              taskInstance.execute = item.execute
-                ? item.execute
+              taskInstance.execute = task.execute
+                ? task.execute
                 : taskInstance.execute;
-              taskInstance.postExecute = item.postExecute
-                ? item.postExecute
+              taskInstance.postExecute = task.postExecute
+                ? task.postExecute
                 : taskInstance.postExecute;
 
-              if (item.preExecute) {
-                if (isFunction(item.preExecute)) {
-                  taskInstance.preExecute = item.preExecute;
+              if (task.preExecute) {
+                if (isFunction(task.preExecute)) {
+                  taskInstance.preExecute = task.preExecute;
                 } else
                   taskInstance.preExecute = ModuleLoader.getInstance().load(
-                    item.preExecute
+                    task.preExecute
                   );
               }
 
-              if (item.execute) {
-                if (isFunction(item.execute)) {
-                  taskInstance.execute = item.execute;
+              if (task.execute) {
+                if (isFunction(task.execute)) {
+                  taskInstance.execute = task.execute;
                 } else
                   taskInstance.execute = ModuleLoader.getInstance().load(
-                    item.execute
+                    task.execute
                   );
               }
 
-              if (item.postExecute) {
-                if (isFunction(item.postExecute)) {
-                  taskInstance.postExecute = item.postExecute;
+              if (task.postExecute) {
+                if (isFunction(task.postExecute)) {
+                  taskInstance.postExecute = task.postExecute;
                 } else
                   taskInstance.postExecute = ModuleLoader.getInstance().load(
-                    item.postExecute
+                    task.postExecute
                   );
               }
             }
 
-            if (item.getRawData) {
-              if (isFunction(item.getRawData)) {
-                taskInstance.getRawData = item.getRawData;
+            if (task.getRawData) {
+              if (isFunction(task.getRawData)) {
+                taskInstance.getRawData = task.getRawData;
               } else
                 taskInstance.getRawData = ModuleLoader.getInstance().load(
-                  item.getRawData
+                  task.getRawData
                 );
             }
 
-            if (item.ovewritables) {
-              /** TODO - anys */
-
-              item.ovewritables.map((method: any) => {
-                if (item[method]) {
-                  if (isFunction(item[method]))
-                    taskInstance[method] = item[method];
+            if (task.ovewritables) {
+              task.ovewritables.map((method: string) => {
+                if (task[method]) {
+                  if (isFunction(task[method]))
+                    taskInstance[method] = task[method];
                   else
                     taskInstance[method] = ModuleLoader.getInstance().load(
-                      item[method]
+                      task[method]
                     );
                 }
               });
@@ -142,11 +143,11 @@ class TaskRunner implements IsTaskRunner {
             Pipeline.getInstance().addTask(taskInstance);
           } else {
             this.logger.warn(
-              `Task named ${item.class} cannot be instantianted`
+              `Task named ${task.class} cannot be instantianted`
             );
           }
         } else {
-          this.logger.info(`Task named ${item.id} skipped`);
+          this.logger.info(`Task named ${task.id} skipped`);
         }
 
         return Pipeline.getInstance();

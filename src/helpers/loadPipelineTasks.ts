@@ -10,7 +10,7 @@ import setPluginSourcePath from "./setPluginSourcePath";
 import { IsTask, IsLogger, IsPlugin } from "../types";
 
 const loadPipelineTasks = (
-  pipelineInfo: [],
+  pipelineInfo: string[],
   pluginsConfigFromPackage: IsPlugin[],
   logger: IsLogger
 ) => {
@@ -96,4 +96,4 @@ const loadPipelineTasks = (
   return tasks;
 };
 
-module.exports = loadPipelineTasks;
+export default loadPipelineTasks;

@@ -6,7 +6,7 @@ const CoreConfiguration: CoreConfigurationType = {
   env: "production",
   defaultKey: "JazzIsAwesome",
   logStrategy: DefaultLogger.getInstance(),
-  moduleLoadStrategy: new ModuleLoadedFromExternal(),
+  moduleLoadStrategy: null, //new ModuleLoadedFromExternal(),
   featureFlags: {
     detachPluginOnPackage: true,
     detachFunctionOnPackage: true,
