@@ -88,6 +88,7 @@ export interface Configuration {
 /**
 * This interface contains the configuration that can be informed in the moment the pipeline runner is instantiated
 * @param configFile: It contains the file path of the jazz configuration file (.js file)
+* @param InputProcessParameters: It contains an object with parameters that will override the default configuration in the file
 * @param logStrategy: [NOT IMPLEMENTED - DO NOT USE] Log Strategy: this option allows the user to set a customized 
 Logger implementation (that needs to implement the interface IsLogger) (common use, for example to log the process results into a text file in File System)   
 * @param debugMode: Turn on/off the debug mode - if turned on, every single message generated in the processors will be displayed to the user
@@ -95,8 +96,9 @@ Logger implementation (that needs to implement the interface IsLogger) (common u
 */
 export interface IsUserConfig {
   configFile: string;
+  inputProcessParameters?: {};
   logStrategy?: logStrategy;
-  debugMode?: boolean;
+  debugMode?: boolean | undefined;
   decryptKey?: string | null;
 }
 

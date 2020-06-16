@@ -14,14 +14,18 @@ const isJSON = (str: string) => {
   return true;
 };
 
-describe("End to End test for pipeline that gets a xml file and converts into json file", () => {
-  beforeAll(() => {
-    const configInfo: IsUserConfig = { configFile: "./e2e-pack-config-1.js" };
+describe("End to End test for pipeline when informing the input and output files through user parameter", () => {
+  it("Should get a the xml file from folder, convert it into json and save it into folder - json must be valid", () => {
+    const configInfo: IsUserConfig = {
+      configFile: "./e2e-pack-config.js",
+      inputProcessParameters: {
+        sourcePath: "./test.xml",
+        outputPath: "./test-2.json"
+      }
+    };
     const runner = new PipelineRunner(configInfo);
     runner.run();
-  });
 
-  it("Should get a the xml file from folder, convert it into json and save it into folder", () => {
     readFile("./test.json", (err, data) => {
       expect(err).toBeNull();
       let content = JSON.parse(data.toString());

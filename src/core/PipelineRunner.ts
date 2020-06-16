@@ -90,6 +90,7 @@ export class PipelineRunner implements IsRunner {
   }
 
   buildRunner(): IsTaskRunner {
+    /** sets the configuration using the configuration file or the configuration object */
     let config: Configuration = {
       pipelineConfiguration: ModuleLoader.getInstance().loadPackage(
         this.userConfig.configFile
@@ -99,7 +100,7 @@ export class PipelineRunner implements IsRunner {
       logger: DefaultLogger.getInstance()
     };
 
-    config.logger.setDebugMode(this.userConfig.debugMode);
+    config.logger.setDebugMode(this.userConfig.debugMode || false);
 
     /** BEGIN - Gets additional parameters according to the pipeline configured */
     const configs: PluginConfiguration[] = loadPluginsConfig(
@@ -122,8 +123,33 @@ export class PipelineRunner implements IsRunner {
     finalParameters = { ...finalParameters, ...userInputParameters };
     /** END - gets additional parameters from user input parameters  in the jazzpack */
 
+    /** checks if there are parameters to override */
+    if (!this.userConfig.inputProcessParameters) {
+      return new TaskRunner(finalParameters, config);
+    } else {
+      /** if there are parameters to override, do this  */
+      //let parameterValue: any = null;
+      let inputParams = {};
+      //let name: string = "";
+
+      /*
+      for (const param in finalParameters) {
+        if (finalParameters.hasOwnProperty(param)) {
+          name = finalParameters[param].name || param;
+          parameterValue = yargs.argv[finalParameters[param].alias];
+          inputParams[name] = parameterValue;
+        }
+      }*/
+
+      inputParams = {
+        ...finalParameters,
+        ...this.userConfig.inputProcessParameters
+      };
+
+      return new TaskRunner(inputParams, config);
+    }
+
     /** BEGIN - Runs tasks on pipeline */
-    return new TaskRunner(finalParameters, config);
   }
 
   run(): void {
